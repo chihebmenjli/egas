@@ -34,6 +34,37 @@ router.get('/famille', function (req, res) {       // Sending Page Query Paramet
 });
 
 
+/* GET FAMILLE  A ID_CATEGORIE*/
+router.get('/famille/:ID_CAT', (req, res) => {       // Sending Page Query Parameter is mandatory http://localhost:3636/api/products?page=1
+    let ID_CAT = req.params.ID_CAT;
+    database.table('famille as f')
+        .join([
+            {
+                table: "categorie as c",
+                on: `c.ID_CATEGORIE = f.CATEGORIE WHERE c.ID_CATEGORIE ='${ID_CAT}' `
+            }
+        ])
+        .withFields(['c.NOM_CATEGORIE as categorie',
+        'f.NOM_FAMILLE',
+        'f.ID_FAMILLE',
+        'f.url'
+        ])
+      
+        
+        .getAll()
+        .then(prods => {
+            if (prods.length > 0) {
+                res.status(200).json({
+                    count: prods.length,
+                    products: prods
+                });
+            } else {
+                res.json({message: `No products  category ${ID_CAT}`});
+            }
+        }).catch(err => res.json(err));
+});
+
+
 
 /* GET ALL CATEGORIE */
 router.get('/categorie', function (req, res) {       // Sending Page Query Parameter is mandatory http://localhost:3636/api/products?page=1

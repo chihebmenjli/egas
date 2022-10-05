@@ -41,6 +41,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 // Import Routes
 const usersRouter = require('./routes/users');
 const productsRouter = require('./routes/products');
+const produitsRouter = require('./routes/produits');
 const categorieRouter = require('./routes/categorie');
 const authRouter = require('./routes/auth');
 const orderRouter = require('./routes/order');
@@ -56,7 +57,8 @@ const orderRouter = require('./routes/order');
 
 app.use('/api/users', usersRouter);
 app.use('/api/products', productsRouter);
-app.use('/api',categorieRouter);
+app.use('/api/produits', produitsRouter);
+app.use('/api/categorie',categorieRouter);
 app.use('/api/auth', authRouter);
 app.use('/api/orders', orderRouter);
 

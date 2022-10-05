@@ -20,7 +20,7 @@ router.post('/register', [
     check('email').isEmail().not().isEmpty().withMessage('Field can\'t be empty')
         .normalizeEmail({all_lowercase: true}),
     check('password').escape().trim().not().isEmpty().withMessage('Field can\'t be empty')
-        .isLength({min: 6}).withMessage("min be 6 characters long"),
+        .isLength({min: 6}).withMessage("must be 6 characters long"),
     body('email').custom(value => {
         return helper.database.table('users').filter({
             $or:

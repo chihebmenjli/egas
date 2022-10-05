@@ -7,7 +7,7 @@ let conn = new Mysqli({
     post: 3306, // port, default 3306 
     user: 'root', // username 
     passwd: '', // password 
-    db: 'egas-egas'
+    db: 'egas'
 });
 
 let db = conn.emit(false, '');
