@@ -47,6 +47,7 @@ const authRouter = require('./routes/auth');
 const orderRouter = require('./routes/order');
 const adminproduit = require('./Admin/produits');
 const adminRouter = require('./Admin/auth_admin');
+const referencesRouter = require('./routes/reference');
 
 
 // Define Routes
@@ -66,5 +67,6 @@ app.use('/api/auth', authRouter);
 app.use('/api/orders', orderRouter);
 app.use('/api/admin/chiheb/auth', adminRouter);
 app.use('/api/admin/chiheb', adminproduit);
+app.use('/api/reference', referencesRouter);
 
 module.exports = app;
