@@ -12,7 +12,7 @@ router.get('/', function (req, res) {
         endValue = page * limit;                  // 10, 20, 30, 40
     } else {
         startValue = 0;
-        endValue = 100;
+        endValue = 50;
     }
     
  
@@ -36,7 +36,7 @@ router.get('/', function (req, res) {
             'p.VISIBLE'
         ])
         .slice(startValue, endValue)
-        .sort()
+        .sort(undefined)
         .getAll()
         .then(prods => {
             if (prods.length > 0) {
@@ -60,13 +60,16 @@ router.get('/:prodId', (req, res) => {
        
        { table : "categorie as c ",
         on : "c.ID_CATEGORIE = p.CATEGORIE" ,
-       } 
+       },
+           { table : "famille as f ",
+               on : "f.ID_FAMILLE = p.FAMILLE" ,
+           }
         ]
        
              )
 
     
-    .withFields(['c.NOM_CATEGORIE as categorie' ,
+    .withFields(['c.NOM_CATEGORIE as categorie' , 'f.NOM_FAMILLE as famille' ,
          
             'p.ID_PRODUIT' ,
             'p.NOM_PRODUIT' ,
@@ -76,14 +79,19 @@ router.get('/:prodId', (req, res) => {
             'p.CATEGORIE' ,
             'p.FAMILLE' ,
             'p.PRIX' ,
-            'p.quantity' ,
+            'p.QUANTITY' ,
             'p.TAXE' ,
             'p.IMAGE' ,
+            'p.IMG',
             'p.ALT' ,
             'p.VISIBLE',
-        
-         
-        ])
+            'p.DOCUMENT',
+            'p.IMG_DOCUMENT',
+            'p.VIDEO' ,
+
+
+
+    ])
         .filter({'p.ID_PRODUIT': productId})
         .get()
         .then(prod => {
@@ -232,11 +240,14 @@ router.get('/famille/:fam', (req, res) => { // Sending Page Query Parameter is m
     database.table('produit as p')
         .join([
             {
+                table: "categorie as c",
+                on: `c.ID_CATEGORIE = p.CATEGORIE`
+            },{
                 table: "famille as f",
                 on: `f.ID_FAMILLE = p.FAMILLE WHERE f.ID_FAMILLE ='${fam_id}'`
             }
         ])
-        .withFields(['f.NOM_FAMILLE as famille',
+        .withFields(['f.NOM_FAMILLE as famille', 'c.NOM_CATEGORIE as categorie' ,
         'p.ID_PRODUIT' ,
         'p.NOM_PRODUIT' ,
         'p.DEF_PRODUIT' ,
@@ -326,6 +337,61 @@ router.get('/product/:proName', (req, res) => { // Sending Page Query Parameter 
 });
 
 
+/* GET produits recherche selon categorie  */
+
+router.get('/product/categorie/:proName', (req, res) => { // Sending Page Query Parameter is mandatory http://localhost:3636/api/products/category/categoryName?page=1
+    let page = (req.query.page !== undefined && req.query.page !== 0) ? req.query.page : 1;   // check if page query param is defined or not
+    const limit = (req.query.limit !== undefined && req.query.limit !== 0) ? req.query.limit : 30;   // set limit of items per page
+    let startValue;
+    let endValue;
+    if (page > 0) {
+        startValue = (page * limit) - limit;      // 0, 10, 20, 30
+        endValue = page * limit;                  // 10, 20, 30, 40
+    } else {
+        startValue = 0;
+        endValue = 10;
+    }
+
+    // Get category title value from param
+    const pro_nom = req.params.proName;
+
+    database.table('produit as p')
+        .join([
+            {
+                table: "categorie as c",
+                on: `c.ID_CATEGORIE = p.CATEGORIE WHERE p.NOM_PRODUIT LIKE '%${pro_nom}%'`
+            }
+        ])
+        .withFields(['c.NOM_CATEGORIE as category',
+            'p.ID_PRODUIT' ,
+            'p.NOM_PRODUIT' ,
+            'p.DEF_PRODUIT' ,
+            'p.REM_PRODUIT' ,
+            'p.DESCRIPTION' ,
+            'p.CATEGORIE' ,
+            'p.FAMILLE' ,
+            'p.PRIX' ,
+            'p.quantity' ,
+            'p.TAXE' ,
+            'p.IMAGE' ,
+            'p.ALT' ,
+            'p.VISIBLE',
+        ])
+        .slice(startValue, endValue)
+
+        .getAll()
+        .then(prods => {
+            if (prods.length > 0) {
+                res.status(200).json({
+                    count: prods.length,
+                    products: prods
+                });
+            } else {
+                res.json({message: `No products found matching the category ${pro_nom}`});
+            }
+        }).catch(err => res.json(err));
+
+});
 
 
 
